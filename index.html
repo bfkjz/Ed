@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <!--适配手机-->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta charset="utf-8">
+    <title>编辑器</title>
+    <script src="js/marked.min.js"></script>
+    <script src="js/highlight.min.js"></script>
+    <script src="js/bftip.js"></script>
+    <script src="js/base64.js"></script>
+    <link rel="stylesheet" href="css/vs2015.min.css">
+    <link rel="stylesheet" href="css/font-awesome.min.css">
+    <link rel="stylesheet" href="css/css.css">
+
+</head>
+
+<body>
+    <div class="box">
+        <div style="display: flex;width: 100%;flex-direction: column;">
+            <div style="display: flex;align-items: center;justify-content: space-between;padding: 0 10px;"><input
+                    type="text" class="input_btn"
+                    style="width: 40%;background: #f6f6f6;font-size: 16px;line-height: 16px;" placeholder="标题"
+                    title="文章标题" id="article_title" spellcheck="false" />
+                <input type="text" class="input_btn"
+                    style="width: 20%;background: #f6f6f6;font-size: 16px;line-height: 16px;" placeholder="标签"
+                    title="多个标签用逗号隔开" id="tag" spellcheck="false" />
+            </div>
+            <div style="padding: 5px 10px 0 10px;">
+                <p style="font-size: 14px;color: #939393;margin: 0 5px;">
+                    <i class="fa fa-clock-o"></i>
+                    <span id="creation_time"></span>
+                </p>
+            </div>
+        </div>
+        <div class="tools">
+            <div class="tools_b">
+                <span onclick="insertText('#')" class="fa fa-header fa-border" title="标题"></span>
+                <span onclick="insertText('**')" class="fa fa-bold fa-border" title="加粗"></span>
+                <span onclick="insertText('*')" class="fa fa-italic fa-border" title="斜体"></span>
+                <span onclick="insertText('> ')" class="fa fa-quote-left fa-border" title="引用"></span>
+                <span onclick="insertText('~~')" class="fa fa-strikethrough fa-border" title="删除线"></span>
+                <span onclick="insertText('<u>')" class="fa fa-underline fa-border" title="下划线"></span>
+                <span onclick="insertText('```')" class="fa fa-code fa-border" title="代码"></span>
+                <span onclick="insertText('1. ')" class="fa fa-list-ol fa-border" title="有序"></span>
+                <span onclick="insertText('- ')" class="fa fa-list-ul fa-border" title="无序"></span>
+                <span onclick="insertText('[]')" class="fa fa-link fa-border" title="链接"></span>
+                <span onclick="insertText('![]')" class="fa fa-image fa-border" title="图片"></span>
+                <span onclick="insertText('||||')" class="fa fa-table fa-border" title="表格"></span>
+                <span onclick="insertText('---')" class="fa fa-window-minimize fa-border" title="分割线"></span>
+                <span onclick="insertText('  ')" class="fa fa-reply fa-flip-vertical fa-border" title="换行"></span>
+                <span onclick="preview()" class="fa fa-eye fa-border" title="预览"></span>
+                <span onclick="beifen()" class="fa fa-cloud-upload fa-border" title="保存备份"></span>
+                <span onclick="huifu()" class="fa fa-cloud-download fa-border" title="恢复备份"></span>
+                <span onclick="shanchu_bf()" class="fa fa-trash fa-border" title="删除备份"></span>
+                <span onclick="settings()" class="fa fa-cog  fa-border" title="设置"></span>
+            </div>
+
+        </div>
+        <textarea id="textarea"></textarea>
+        <div>
+            <p id="publish_box">
+                <span class="fa fa-send" onclick="publish()" id="publish"> 发表 </span>
+            </p>
+            
+        </div>
+    </div>
+    <div id="preview_box">
+        <div id="off_p"><span class="fa fa-eye-slash fa-border" title="关闭预览" onclick="off_p()"></span></div>
+        <div id="p_content"></div>
+    </div>
+    <div id="settings_box">
+        <div id="off_set"><span class="fa fa-sign-out fa-border" title="关闭设置" onclick="off_set()"></span></div>
+        <div id="set_content">
+            <div
+                style="display: flex;flex-direction: column;align-items: center;justify-content: center;padding: 5px;margin: 10px;">
+                <p style="margin: 5px;">Access_Token</p>
+                <div style="display: flex;align-items: center; justify-content: center;">
+                    <input type="text" id="access_token" class="input_btn"><span onclick="save_token()" title="存储Token"
+                        class="fa fa-check fa-border save_btn"></span>
+                </div>
+                <span onclick="cls_token()" title="清除Token" class="fa fa-trash-o fa-border cls_btn"></span>
+            </div>
+            <div
+                style="display: flex;flex-direction: column;align-items: center;justify-content: center;padding: 5px;margin: 10px;">
+                <p style="margin: 5px;">Owner用户名</p>
+                <div style="display: flex;align-items: center; justify-content: center;">
+                    <input type="text" id="owner" class="input_btn"><span onclick="save_owner()" title="存储Owner用户名"
+                        class="fa fa-check fa-border save_btn"></span>
+                </div>
+                <span onclick="cls_owner()" title="清除Owner用户名" class="fa fa-trash-o fa-border cls_btn"></span>
+            </div>
+            <div
+                style="display: flex;flex-direction: column;align-items: center;justify-content: center;padding: 5px;margin: 10px;">
+                <p style="margin: 5px;">Repo仓库名</p>
+                <div style="display: flex;align-items: center; justify-content: center;">
+                    <input type="text" id="repo" class="input_btn"><span onclick="save_repo()" title="存储Repo仓库名"
+                        class="fa fa-check fa-border save_btn"></span>
+                </div>
+                <span onclick="cls_repo()" title="清除Repo仓库名" class="fa fa-trash-o fa-border cls_btn"></span>
+            </div>
+            <div
+                style="display: flex;flex-direction: column;align-items: center;justify-content: center;padding: 5px;margin: 10px;">
+                <p style="margin: 5px;">Path路径</p>
+                <div style="display: flex;align-items: center; justify-content: center;">
+                    <input type="text" id="path" class="input_btn" value="/" /><span onclick="save_path()"
+                        title="存储Path路径" class="fa fa-check fa-border save_btn"></span>
+                </div>
+                <span onclick="cls_path()" title="清除Path路径" class="fa fa-trash-o fa-border cls_btn"></span>
+            </div>
+
+        </div>
+    </div>
+</body>
+<div
+    style="height: 100%;width: 100%;background-image: url('https://cdn.jsdelivr.net/gh/bfkjz/bfkjz.github.io/static/img/bg.svg');background-repeat: repeat;position: fixed;top: 0;left: 0;bottom: 0;right: 0;opacity: 0.05;   z-index: -10; background-position: top;">
+</div>
+<script>
+    window.onload = function () {
+        document.getElementById('creation_time').innerText = creation_time;
+        if (localStorage.getItem("access_tk") !== null) {
+            document.getElementById("set_content").getElementsByTagName("input")[0].value = localStorage.getItem("access_tk");
+        }
+        if (localStorage.getItem("owner_") !== null) {
+            document.getElementById("set_content").getElementsByTagName("input")[1].value = localStorage.getItem("owner_");
+        }
+        if (localStorage.getItem("repo_") !== null) {
+            document.getElementById("set_content").getElementsByTagName("input")[2].value = localStorage.getItem("repo_");
+        }
+        if (localStorage.getItem("path_") !== null) {
+            document.getElementById("set_content").getElementsByTagName("input")[3].value = localStorage.getItem("path_");
+        } else {
+            document.getElementById("set_content").getElementsByTagName("input")[3].value = "/";
+        }
+    };
+    //获取当前时间
+    var myDate = new Date();
+    myDate.getFullYear();
+    myDate.getMonth();
+    myDate.getDate();
+    Date.prototype.Format = function (fmt) { // author: meizz
+        var o = {
+            "M+": this.getMonth() + 1, // 月份
+            "d+": this.getDate(), // 日
+            "h+": this.getHours(), // 小时
+        };
+        if (/(y+)/.test(fmt))
+            fmt = fmt.replace(RegExp.$1, (this.getFullYear() + "").substr(4 - RegExp.$1.length));
+        for (var k in o)
+            if (new RegExp("(" + k + ")").test(fmt)) fmt = fmt.replace(RegExp.$1, (RegExp.$1.length == 1) ? (o[k]) : (("00" + o[k]).substr(("" + o[k]).length)));
+        return fmt;
+    }
+
+    var creation_time = new Date().Format("yyyy-MM-dd").toString();
+    //
+
+
+    // document.getElementById('textarea').value = md_content;
+    function preview() {
+        var MDcontent = document.getElementById('textarea').value;
+        document.getElementById('p_content').innerHTML = marked(MDcontent.toString());
+        hljs.initHighlightingOnLoad();
+        document.getElementById("preview_box").style.left = "0px";
+        document.getElementById("preview_box").style.height = "+100%";
+
+    }
+    function off_p() {
+        document.getElementById("preview_box").style.left = "+100%";
+        document.getElementById("preview_box").style.height = "0%";
+    }
+    /* 插入格式 */
+    function insertText(val) {
+        var input = document.getElementById('textarea');
+        var inputlen = input.value.length;
+        if (typeof document.selection != "undefined") {
+            //当input对象中没有激活选区时，在最后面插入val
+            document.selection.createRange().text = val;
+
+        }
+        //当input对象中有激活选区时，按情况插入val
+        else {
+            var left = input.value.substring(0, input.selectionStart);
+            var midd = input.value.substring(input.selectionStart, input.selectionEnd);
+            var right = input.value.substring(input.selectionEnd, inputlen);
+            if (val == '#') { //标题
+                input.value = left + val + midd + right;
+            }
+            if (val == '**') { //加粗
+                input.value = left + '**' + midd + '**' + right;
+            }
+            if (val == '*') { //斜体
+                input.value = left + '*' + midd + '*' + right;
+            }
+            if (val == '> ') { //引用
+                input.value = left + '> ' + midd + right;
+            }
+            if (val == '~~') { //删除线
+                input.value = left + '~~' + midd + '~~' + right;
+            }
+            if (val == '<u>') { //下划线
+                input.value = left + '<u>' + midd + '</u>' + right;
+            }
+            if (val == '```') { //代码
+                input.value = left + '```' + "\n" + midd + "\n" + '```' + right;
+            }
+            if (val == '1. ') { //有序
+                input.value = left + val + midd + right;
+            }
+            if (val == '- ') { //无序
+                input.value = left + val + midd + right;
+            }
+            if (val == '[]') { //链接
+                input.value = left + '[' + midd + '](https://)' + right;
+            }
+            if (val == '![]') {
+                input.value = left + '![' + midd + '](https://)' + right;
+            }
+            if (val == '||||') {
+                input.value = left + '|标题|' + "\n" + '|--|' + "\n" + '|内容|' + right;
+            }
+            if (val == '---') { //分割线
+                input.value = left + val + "\n" + right;
+            }
+            if (val == '  ') { //换行
+                input.value = left + midd + val + "\n" + right;
+            }
+
+            input.focus();//使得textarea获取焦点
+        }
+    }
+
+    // 定时5分钟自动保存
+    var t2 = window.setInterval(function () {
+        bftip("1", "自动备份成功")
+        beifen();
+    }, 300000)
+    //window.clearInterval(t2)  // 去除定时器
+    function beifen() {
+        var bf_cont = document.getElementById('textarea').value;
+        localStorage.setItem('title_', document.getElementById('article_title').value);
+        localStorage.setItem('tag_', document.getElementById('tag').value);
+        localStorage.setItem('bf', bf_cont);
+        bftip("1", "备份成功");
+
+    }
+
+    function huifu() {
+        var hf_cont = localStorage.getItem('bf');
+        document.getElementById('textarea').value = hf_cont;
+        document.getElementById('article_title').value = localStorage.getItem('title_');
+        document.getElementById('tag').value = localStorage.getItem('tag_');
+        bftip("1", "恢复成功");
+    }
+    function shanchu_bf() {
+        localStorage.removeItem('bf');
+        localStorage.removeItem('title_');
+        localStorage.removeItem('tag_');
+        bftip("1", "删除备份成功");
+    }
+    function settings() {
+        document.getElementById("settings_box").style.left = "0px";
+        document.getElementById("settings_box").style.height = "+100%";
+
+    }
+    function off_set() {
+        document.getElementById("settings_box").style.left = "+100%";
+        document.getElementById("settings_box").style.height = "0%";
+    }
+    function publish() {
+        if (document.getElementById("article_title").value == '') {
+            bftip("3", "文章标题不能为空");
+        } else {
+
+            var md_content =
+`---
+layout: mypost
+title: ${document.getElementById("article_title").value}
+categories: [${document.getElementById("tag").value}]
+---  
+
+`;
+
+
+            if (document.getElementById("set_content").getElementsByTagName("input")[0].value == "") {
+                bftip("2", "Access_Token不能为空")
+            } else if (document.getElementById("set_content").getElementsByTagName("input")[1].value == "") {
+                bftip("2", "Owner用户名不能为空")
+            } else if (document.getElementById("set_content").getElementsByTagName("input")[2].value == "") {
+                bftip("2", "Repo仓库名不能为空")
+            } else if (document.getElementById("set_content").getElementsByTagName("input")[3].value == "") {
+                bftip("2", "Path路径不能为空,根目录为“/”")
+            } else {
+                var access_tk = document.getElementById("set_content").getElementsByTagName("input")[0].value;
+                var owner_ = document.getElementById("set_content").getElementsByTagName("input")[1].value;
+                var repo_ = document.getElementById("set_content").getElementsByTagName("input")[2].value;
+                var path_ = document.getElementById("set_content").getElementsByTagName("input")[3].value;
+                var filename = document.getElementById("creation_time").innerText + "-" + document.getElementById("article_title").value + ".md";
+                var blog_content = md_content + document.getElementById('textarea').value;
+                var b = new Base64();
+                var base64_content = b.encode(blog_content);
+                if (path_ !== "/") {
+                    filename = "/" + filename;
+                    path_="/"+path_
+                }
+
+                let request = new XMLHttpRequest(); // 新建XMLHttpRequest对象
+                request.onreadystatechange = function () { // 状态发生变化时，函数被回调
+                    if (request.readyState === 4) { // 成功完成
+                        // 判断响应结果:
+                        if (request.status == 200 || request.status == 201 || request.status == 0) {
+                            // 成功，通过responseText拿到响应的文本:
+                            qiyong();
+                            bftip("1","发表成功")
+                            console.log(request.status+" 发表成功");
+                        } else if (request.status == 422) {
+                            qiyong();
+                            bftip("2","发表失败，重复标题")
+                            console.log(request.status+" 发表失败,重复的标题");
+                        } else if (request.status == 401) {
+                            qiyong();
+                            bftip("3","发表失败,检查token")
+                            console.log(request.status+" 发表失败,检查token")
+                        } else if (request.status == 404) {
+                            qiyong();
+                            bftip("3","发表失败,检查Owner或者Repo")
+                            console.log(request.status+" 发表失败,检查Owner或者Repo")
+                        }else{
+                            qiyong();
+                            bftip("2","发表失败,错误代码：" + request.status)
+                            console.log("发表失败,错误代码：" + request.status)
+                        }
+                    }else{
+                        bftip("0","发表中请勿关闭");
+                        console.log("发表中请勿关闭");
+                        jinyong();
+                    }
+                }
+                // 发送请求:
+                request.open('PUT', 'https://api.github.com/repos/' + owner_ + '/' + repo_ + '/contents' + path_ + filename);
+                request.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+                request.setRequestHeader('Authorization', 'token '+ access_tk);
+                request.send(JSON.stringify({
+                    "content": base64_content,
+                    "message": filename,
+                }));
+
+
+            }
+
+
+        }
+
+    }
+
+    function save_token() {
+        let access_tk = document.getElementById("set_content").getElementsByTagName("input")[0].value;
+        if (access_tk == "") {
+            bftip("3", "Access_Token不能为空")
+
+        } else {
+            localStorage.setItem('access_tk', access_tk);
+            bftip("1", "保存成功");
+        }
+
+
+    }
+    function cls_token() {
+        if (localStorage.getItem("access_tk") !== null) {
+            document.getElementById("set_content").getElementsByTagName("input")[0].value = "";
+            localStorage.removeItem('access_tk');
+            bftip("1", "删除成功");
+        } else {
+            bftip("0", "Access_Token为空不用删除");
+        }
+
+    }
+    function save_owner() {
+        let owner_ = document.getElementById("set_content").getElementsByTagName("input")[1].value;
+        if (owner_ == "") {
+            bftip("3", "Owner不能为空")
+
+        } else {
+            localStorage.setItem('owner_', owner_);
+            bftip("1", "保存成功");
+        }
+
+
+    }
+    function cls_owner() {
+        if (localStorage.getItem("owner_") !== null) {
+            document.getElementById("set_content").getElementsByTagName("input")[1].value = "";
+            localStorage.removeItem('owner_');
+            bftip("1", "删除成功");
+        } else {
+            bftip("0", "Owner为空不用删除");
+        }
+
+    }
+    function save_repo() {
+        let repo_ = document.getElementById("set_content").getElementsByTagName("input")[2].value;
+        if (repo_ == "") {
+            bftip("3", "Repo不能为空")
+
+        } else {
+            localStorage.setItem('repo_', repo_);
+            bftip("1", "保存成功");
+        }
+
+
+    }
+    function cls_repo() {
+        if (localStorage.getItem("repo_") !== null) {
+            document.getElementById("set_content").getElementsByTagName("input")[2].value = "";
+            localStorage.removeItem('repo_');
+            bftip("1", "删除成功");
+        } else {
+            bftip("0", "Repo为空不用删除");
+        }
+
+    }
+    function save_path() {
+        let path_ = document.getElementById("set_content").getElementsByTagName("input")[3].value;
+        if (path_ == "") {
+            bftip("3", "path不能为空,根目录为“/”")
+
+        } else {
+            localStorage.setItem('path_', path_);
+            bftip("1", "保存成功");
+        }
+
+    }
+    function cls_path() {
+        if (localStorage.getItem("path_") !== null) {
+            document.getElementById("set_content").getElementsByTagName("input")[3].value = "/";
+            localStorage.removeItem('path_');
+            bftip("1", "删除成功");
+        } else {
+            bftip("0", "Path为空不用删除");
+        }
+
+    }
+    function jinyong(){
+        document.getElementById('publish').style.pointerEvents = 'none';
+        document.getElementById('publish_box').style.cursor = 'no-drop';
+
+    }
+    function qiyong(){
+        document.getElementById('publish').style.pointerEvents = 'auto';
+        document.getElementById('publish_box').style.cursor = 'auto';
+
+    }
+
+</script>
+
+</html>
