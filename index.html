@@ -118,6 +118,10 @@
 </div>
 <script>
     window.onload = function () {
+        document.getElementById("access_token").style.display = "none";
+        document.getElementById("owner").style.display = "none";
+        document.getElementById("repo").style.display = "none";
+        document.getElementById("path").style.display = "none";
         if (localStorage.getItem('bf') !== "") { huifu() };
         document.getElementById('creation_time').innerText = creation_time;
         if (localStorage.getItem("access_tk") !== null) {
