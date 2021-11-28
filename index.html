@@ -63,7 +63,7 @@
             <p id="publish_box">
                 <span class="fa fa-send" onclick="publish()" id="publish"> 发表 </span>
             </p>
-            
+
         </div>
     </div>
     <div id="preview_box">
@@ -118,6 +118,7 @@
 </div>
 <script>
     window.onload = function () {
+        if (localStorage.getItem('bf') !== "") { huifu() };
         document.getElementById('creation_time').innerText = creation_time;
         if (localStorage.getItem("access_tk") !== null) {
             document.getElementById("set_content").getElementsByTagName("input")[0].value = localStorage.getItem("access_tk");
@@ -261,11 +262,20 @@
     function settings() {
         document.getElementById("settings_box").style.left = "0px";
         document.getElementById("settings_box").style.height = "+100%";
+        document.getElementById("access_token").style.display = "block";
+        document.getElementById("owner").style.display = "block";
+        document.getElementById("repo").style.display = "block";
+        document.getElementById("path").style.display = "block";
 
     }
     function off_set() {
         document.getElementById("settings_box").style.left = "+100%";
         document.getElementById("settings_box").style.height = "0%";
+        document.getElementById("access_token").style.display = "none";
+        document.getElementById("owner").style.display = "none";
+        document.getElementById("repo").style.display = "none";
+        document.getElementById("path").style.display = "none";
+
     }
     function publish() {
         if (document.getElementById("article_title").value == '') {
@@ -273,7 +283,7 @@
         } else {
 
             var md_content =
-`---
+                `---
 layout: mypost
 title: ${document.getElementById("article_title").value}
 categories: [${document.getElementById("tag").value}]
@@ -301,7 +311,7 @@ categories: [${document.getElementById("tag").value}]
                 var base64_content = b.encode(blog_content);
                 if (path_ !== "/") {
                     filename = "/" + filename;
-                    path_="/"+path_
+                    path_ = "/" + path_
                 }
 
                 let request = new XMLHttpRequest(); // 新建XMLHttpRequest对象
@@ -311,27 +321,27 @@ categories: [${document.getElementById("tag").value}]
                         if (request.status == 200 || request.status == 201 || request.status == 0) {
                             // 成功，通过responseText拿到响应的文本:
                             qiyong();
-                            bftip("1","发表成功")
-                            console.log(request.status+" 发表成功");
+                            bftip("1", "发表成功")
+                            console.log(request.status + " 发表成功");
                         } else if (request.status == 422) {
                             qiyong();
-                            bftip("2","发表失败，重复标题")
-                            console.log(request.status+" 发表失败,重复的标题");
+                            bftip("2", "发表失败，重复标题")
+                            console.log(request.status + " 发表失败,重复的标题");
                         } else if (request.status == 401) {
                             qiyong();
-                            bftip("3","发表失败,检查token")
-                            console.log(request.status+" 发表失败,检查token")
+                            bftip("3", "发表失败,检查token")
+                            console.log(request.status + " 发表失败,检查token")
                         } else if (request.status == 404) {
                             qiyong();
-                            bftip("3","发表失败,检查Owner或者Repo")
-                            console.log(request.status+" 发表失败,检查Owner或者Repo")
-                        }else{
+                            bftip("3", "发表失败,检查Owner或者Repo")
+                            console.log(request.status + " 发表失败,检查Owner或者Repo")
+                        } else {
                             qiyong();
-                            bftip("2","发表失败,错误代码：" + request.status)
+                            bftip("2", "发表失败,错误代码：" + request.status)
                             console.log("发表失败,错误代码：" + request.status)
                         }
-                    }else{
-                        bftip("0","发表中请勿关闭");
+                    } else {
+                        bftip("0", "发表中请勿关闭");
                         console.log("发表中请勿关闭");
                         jinyong();
                     }
@@ -339,7 +349,7 @@ categories: [${document.getElementById("tag").value}]
                 // 发送请求:
                 request.open('PUT', 'https://api.github.com/repos/' + owner_ + '/' + repo_ + '/contents' + path_ + filename);
                 request.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
-                request.setRequestHeader('Authorization', 'token '+ access_tk);
+                request.setRequestHeader('Authorization', 'token ' + access_tk);
                 request.send(JSON.stringify({
                     "content": base64_content,
                     "message": filename,
@@ -440,16 +450,20 @@ categories: [${document.getElementById("tag").value}]
         }
 
     }
-    function jinyong(){
+    function jinyong() {
         document.getElementById('publish').style.pointerEvents = 'none';
         document.getElementById('publish_box').style.cursor = 'no-drop';
 
     }
-    function qiyong(){
+    function qiyong() {
         document.getElementById('publish').style.pointerEvents = 'auto';
         document.getElementById('publish_box').style.cursor = 'auto';
 
     }
+
+    window.onbeforeunload = function (event) {
+        event.returnValue = "你所做的更改可能未保存.";
+    };
 
 </script>
 
