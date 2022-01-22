@@ -10,7 +10,7 @@ function bftip(type, text) {
     } else {
         var tip_box = document.createElement('div');
         tip_box.id = "tip_box";
-        tip_box.style = "position: absolute;right: 0;top: 20px;/*pointer-events: none;*/z-index: 9998;width: auto;height: auto;display: flex;flex-flow: column-reverse;align-items: flex-end;";
+        tip_box.style = "position: fixed;right: 0;top: 20px;/*pointer-events: none;*/z-index: 9998;width: auto;height: auto;display: flex;flex-flow: column-reverse;align-items: flex-end;";
         document.body.appendChild(tip_box);
     }
 
