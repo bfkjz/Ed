@@ -25,7 +25,7 @@
                     title="文章标题" id="article_title" spellcheck="false" />
                  <input type="text" class="input_btn"
                     style="width: 25%;background: #f6f6f6;font-size: 16px;line-height: 16px;" placeholder="摘要"
-                    title="多个标签用逗号隔开" id="extract" spellcheck="false" />
+                    title="多个标签用逗号隔开" id="excerpt" spellcheck="false" />
                 <input type="text" class="input_btn"
                     style="width: 15%;background: #f6f6f6;font-size: 16px;line-height: 16px;" placeholder="标签"
                     title="多个标签用逗号隔开" id="tag" spellcheck="false" />
@@ -296,7 +296,7 @@
                 `---
 layout: mypost
 title: ${document.getElementById("article_title").value}
-extract: ${document.getElementById("extract").value}
+excerpt: ${document.getElementById("excerpt").value}
 categories: [${document.getElementById("tag").value}]
 imgurl: ${document.getElementById("imgurl").value}
 ---  
